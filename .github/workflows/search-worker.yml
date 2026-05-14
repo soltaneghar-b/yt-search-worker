@@ -55,7 +55,7 @@ jobs:
         env:
           SEARCH_WORKER: "true"
           WORKER_SHARD: ${{ inputs.shard }}
-          WORKER_SHARD_COUNT: "20"
+          WORKER_SHARD_COUNT: "5"
           SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
           SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
           BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
