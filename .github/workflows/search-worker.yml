@@ -30,7 +30,7 @@ jobs:
           app-id: ${{ secrets.SEARCH1_APP_ID }}
           private-key: ${{ secrets.SEARCH1_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-          repositories: "yt-streamer-config"
+          repositories: "yt-streamer-config,ytbot_rust_dev"
 
       - name: 🔐 Token
         id: token2
@@ -39,13 +39,13 @@ jobs:
           app-id: ${{ secrets.SEARCH2_APP_ID }}
           private-key: ${{ secrets.SEARCH2_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-          repositories: "yt-streamer-config"
+          repositories: "yt-streamer-config,ytbot_rust_dev"
 
       - name: 📥 Binary
         run: |
           curl -fSL --retry 3 -o yt-streamer-bot \
-            -H "Authorization: Bearer ${{ secrets.GH_TOKEN_FOR_BINARY }}" \
-            "https://raw.githubusercontent.com/${{ github.repository_owner }}/ytbot_rust/refs/heads/bot-binary/yt-streamer-bot"
+            -H "Authorization: Bearer ${{ steps.token1.outputs.token }}" \
+            "https://raw.githubusercontent.com/${{ github.repository_owner }}/ytbot_rust_dev/refs/heads/bot-binary/yt-streamer-bot"
           chmod +x yt-streamer-bot
 
       - name: 🧰 yt-dlp
@@ -58,7 +58,7 @@ jobs:
           WORKER_SHARD_COUNT: "20"
           SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
           SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
-          BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
+          BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN_DEV }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
           BOT_REPO: "yt-search-worker"
           SEARCH_RESULTS_REPO: "yt-streamer-config"
