@@ -1,0 +1,68 @@
+name: 🔍 Search Worker
+
+on:
+  workflow_dispatch:
+    inputs:
+      shard:
+        description: 'Shard number'
+        required: true
+        type: number
+
+concurrency:
+  group: search-worker-${{ inputs.shard }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  worker:
+    name: shard ${{ inputs.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: 🔐 Token
+        id: token1
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SEARCH1_APP_ID }}
+          private-key: ${{ secrets.SEARCH1_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "yt-streamer-config"
+
+      - name: 🔐 Token
+        id: token2
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SEARCH2_APP_ID }}
+          private-key: ${{ secrets.SEARCH2_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "yt-streamer-config"
+
+      - name: 📥 Binary
+        run: |
+          curl -fSL --retry 3 -o yt-streamer-bot \
+            -H "Authorization: Bearer ${{ secrets.GH_TOKEN_FOR_BINARY }}" \
+            "https://raw.githubusercontent.com/${{ github.repository_owner }}/ytbot_rust/refs/heads/bot-binary/yt-streamer-bot"
+          chmod +x yt-streamer-bot
+
+      - name: 🧰 yt-dlp
+        run: pip install yt-dlp==2026.3.17
+
+      - name: 🚀 Run
+        env:
+          SEARCH_WORKER: "true"
+          WORKER_SHARD: ${{ inputs.shard }}
+          WORKER_SHARD_COUNT: "20"
+          SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
+          SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
+          BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          BOT_REPO: "yt-search-worker"
+          SEARCH_RESULTS_REPO: "yt-streamer-config"
+          APP_ID: "0"
+          APP_PRIVATE_KEY: "unused"
+          INSTALLATION_ID: "0"
+        run: ./yt-streamer-bot
