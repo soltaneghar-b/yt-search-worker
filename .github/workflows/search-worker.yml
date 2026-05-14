@@ -55,9 +55,13 @@ jobs:
         env:
           SEARCH_WORKER: "true"
           WORKER_SHARD: ${{ inputs.shard }}
-          WORKER_SHARD_COUNT: "5"
+          WORKER_SHARD_COUNT: "3"
           SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
           SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
+          # Worker self‑refresh credentials (primary app)
+          WORKER_APP_ID: ${{ secrets.SEARCH1_APP_ID }}
+          WORKER_APP_PRIVATE_KEY: ${{ secrets.SEARCH1_APP_PRIVATE_KEY }}
+          WORKER_INSTALLATION_ID: ${{ secrets.SEARCH1_INSTALLATION_ID }}
           BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
           BALE_BOT_TOKEN_DEV: ${{ secrets.BALE_BOT_TOKEN_DEV }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
