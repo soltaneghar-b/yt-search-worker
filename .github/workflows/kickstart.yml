@@ -1,0 +1,20 @@
+name: 🚀 Kickstart Workers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fire all 20 shards
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # built‑in token, needs actions:write
+        run: |
+          for shard in $(seq 0 19); do
+            gh workflow run search-worker.yml \
+              -R ${{ github.repository }} \
+              -f shard=$shard
+            echo "✅ Dispatched shard $shard"
+            sleep 2   # small pause to avoid secondary rate limits
+          done
