@@ -1,0 +1,26 @@
+name: 🛑 Cancel All Workers
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel all search-worker runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUNS=$(gh run list -R "${{ github.repository }}" \
+            --workflow search-worker.yml \
+            --status in_progress \
+            --json databaseId \
+            --jq '.[].databaseId')
+          if [ -z "$RUNS" ]; then
+            echo "No running workers found."
+            exit 0
+          fi
+          for ID in $RUNS; do
+            echo "Cancelling run $ID"
+            gh run cancel "$ID" -R "${{ github.repository }}"
+          done
