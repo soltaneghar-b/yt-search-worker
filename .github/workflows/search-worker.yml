@@ -1,6 +1,10 @@
 name: 🔍 Search Worker
 
 on:
+  schedule:
+    # Run every 10 minutes as a fallback – ensures search placeholders are
+    # processed even if the bot's trigger dispatch fails.
+    - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
       shard:
@@ -58,10 +62,6 @@ jobs:
           WORKER_SHARD_COUNT: "3"
           SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
           SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
-          # Worker self‑refresh credentials (primary app)
-          WORKER_APP_ID: ${{ secrets.SEARCH1_APP_ID }}
-          WORKER_APP_PRIVATE_KEY: ${{ secrets.SEARCH1_APP_PRIVATE_KEY }}
-          WORKER_INSTALLATION_ID: ${{ secrets.SEARCH1_INSTALLATION_ID }}
           BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
           BALE_BOT_TOKEN_DEV: ${{ secrets.BALE_BOT_TOKEN_DEV }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
