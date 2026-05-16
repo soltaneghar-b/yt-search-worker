@@ -2,8 +2,8 @@ name: 🔍 Search Worker
 
 on:
   schedule:
-    # Run every 10 minutes as a fallback – ensures search placeholders are
-    # processed even if the bot's trigger dispatch fails.
+    # Runs every 10 minutes – ensures search placeholders are processed
+    # even if the bot’s trigger dispatch fails.
     - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
@@ -13,7 +13,7 @@ on:
         type: number
 
 concurrency:
-  group: search-worker-${{ inputs.shard }}
+  group: search-worker-${{ github.event.inputs.shard || matrix.shard }}
   cancel-in-progress: false
 
 permissions:
@@ -21,11 +21,68 @@ permissions:
   actions: write
 
 jobs:
-  worker:
+  # ---------- Scheduled run (all shards) ----------
+  worker-scheduled:
+    if: github.event_name == 'schedule'
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
+    name: shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: 🔐 Token
+        id: token1
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SEARCH1_APP_ID }}
+          private-key: ${{ secrets.SEARCH1_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "yt-streamer-config,ytbot_rust"
+
+      - name: 🔐 Token
+        id: token2
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SEARCH2_APP_ID }}
+          private-key: ${{ secrets.SEARCH2_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: "yt-streamer-config,ytbot_rust"
+
+      - name: 📥 Binary
+        run: |
+          curl -fSL --retry 3 -o yt-streamer-bot \
+            -H "Authorization: Bearer ${{ steps.token1.outputs.token }}" \
+            "https://raw.githubusercontent.com/${{ github.repository_owner }}/ytbot_rust/refs/heads/bot-binary/yt-streamer-bot"
+          chmod +x yt-streamer-bot
+
+      - name: 🧰 yt-dlp
+        run: pip install yt-dlp==2026.3.17
+
+      - name: 🚀 Run
+        env:
+          SEARCH_WORKER: "true"
+          WORKER_SHARD: ${{ matrix.shard }}
+          WORKER_SHARD_COUNT: "3"
+          SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
+          SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
+          BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
+          BALE_BOT_TOKEN_DEV: ${{ secrets.BALE_BOT_TOKEN_DEV }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          BOT_REPO: "yt-search-worker"
+          SEARCH_RESULTS_REPO: "yt-streamer-config"
+          APP_ID: "0"
+          APP_PRIVATE_KEY: "unused"
+          INSTALLATION_ID: "0"
+        run: ./yt-streamer-bot
+
+  # ---------- Manual dispatch (single shard) ----------
+  worker-manual:
+    if: github.event_name == 'workflow_dispatch'
     name: shard ${{ inputs.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
-
     steps:
       - name: 🔐 Token
         id: token1
