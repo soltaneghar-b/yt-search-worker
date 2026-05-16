@@ -2,8 +2,6 @@ name: 🔍 Search Worker
 
 on:
   schedule:
-    # Runs every 10 minutes – ensures search placeholders are processed
-    # even if the bot’s trigger dispatch fails.
     - cron: '*/10 * * * *'
   workflow_dispatch:
     inputs:
@@ -11,10 +9,6 @@ on:
         description: 'Shard number'
         required: true
         type: number
-
-concurrency:
-  group: search-worker-${{ github.event.inputs.shard || matrix.shard }}
-  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -31,6 +25,9 @@ jobs:
     name: shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    concurrency:
+      group: search-worker-scheduled-${{ matrix.shard }}
+      cancel-in-progress: false
     steps:
       - name: 🔐 Token
         id: token1
@@ -83,6 +80,9 @@ jobs:
     name: shard ${{ inputs.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    concurrency:
+      group: search-worker-${{ inputs.shard }}
+      cancel-in-progress: false
     steps:
       - name: 🔐 Token
         id: token1
