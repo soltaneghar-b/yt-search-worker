@@ -64,6 +64,12 @@ jobs:
           WORKER_SHARD_COUNT: "3"
           SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
           SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
+          SEARCH1_APP_ID: ${{ secrets.SEARCH1_APP_ID }}
+          SEARCH1_APP_PRIVATE_KEY: ${{ secrets.SEARCH1_APP_PRIVATE_KEY }}
+          SEARCH1_INSTALLATION_ID: ${{ secrets.SEARCH1_INSTALLATION_ID }}
+          SEARCH2_APP_ID: ${{ secrets.SEARCH2_APP_ID }}
+          SEARCH2_APP_PRIVATE_KEY: ${{ secrets.SEARCH2_APP_PRIVATE_KEY }}
+          SEARCH2_INSTALLATION_ID: ${{ secrets.SEARCH2_INSTALLATION_ID }}
           BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
           BALE_BOT_TOKEN_DEV: ${{ secrets.BALE_BOT_TOKEN_DEV }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
@@ -119,6 +125,12 @@ jobs:
           WORKER_SHARD_COUNT: "3"
           SEARCH_GITHUB_TOKEN: ${{ steps.token1.outputs.token }}
           SEARCH_GITHUB_TOKEN2: ${{ steps.token2.outputs.token }}
+          SEARCH1_APP_ID: ${{ secrets.SEARCH1_APP_ID }}
+          SEARCH1_APP_PRIVATE_KEY: ${{ secrets.SEARCH1_APP_PRIVATE_KEY }}
+          SEARCH1_INSTALLATION_ID: ${{ secrets.SEARCH1_INSTALLATION_ID }}
+          SEARCH2_APP_ID: ${{ secrets.SEARCH2_APP_ID }}
+          SEARCH2_APP_PRIVATE_KEY: ${{ secrets.SEARCH2_APP_PRIVATE_KEY }}
+          SEARCH2_INSTALLATION_ID: ${{ secrets.SEARCH2_INSTALLATION_ID }}
           BALE_BOT_TOKEN: ${{ secrets.BALE_BOT_TOKEN }}
           BALE_BOT_TOKEN_DEV: ${{ secrets.BALE_BOT_TOKEN_DEV }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
